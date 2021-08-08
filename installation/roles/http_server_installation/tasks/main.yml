@@ -1,0 +1,21 @@
+---
+- name: Install Apache HTTP Server
+  yum: 
+    name: httpd
+    state: present
+
+- name: Start & Enable Server
+  service: 
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Configure Proxy for App
+  template: 
+    src: automationexerciseapp.conf
+    dest: /etc/httpd/conf.modules.d/automationexerciseapp.conf
+
+- name: Restart the Server
+  service: 
+    name: httpd
+    state: restarted

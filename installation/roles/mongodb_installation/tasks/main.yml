@@ -1,0 +1,16 @@
+---
+- name: Add mongod repo file
+  template: 
+    src: mongodb-org-5.0.repo
+    dest: /etc/yum.repos.d/mongodb-org-5.0.repo
+
+- name: Install Mongodb
+  yum: 
+    name: mongodb-org
+    state: present
+
+- name: Run mongodb
+  service: 
+    name: mongod
+    state: started
+    enabled: yes

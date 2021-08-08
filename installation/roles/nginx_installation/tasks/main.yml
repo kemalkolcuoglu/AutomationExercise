@@ -1,0 +1,26 @@
+---
+- name: Install NginX Server
+  dnf:
+    name: nginx
+    state: present
+
+- name: Ensures sites-available dir exists
+  file:
+    path: /etc/nginx/sites-available/
+    state: directory
+
+- name: Configure Proxy for App
+  template:
+    src: automationexerciseapp.conf
+    dest: /etc/nginx/sites-available/default
+
+- name: Insert a line at the end of a file.
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    line: add_header X-Frame-Options "SAMEORIGIN";
+
+- name: Start & Enable Server
+  service:
+    name: nginx
+    state: started
+    enabled: yes

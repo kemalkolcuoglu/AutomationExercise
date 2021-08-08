@@ -1,0 +1,45 @@
+---
+
+- name: Install DotNet Environment
+  dnf:
+    name: dotnet-sdk-5.0
+    state: present
+
+- name: Fetch the App from Remote
+  git:
+    repo: 'https://github.com/kemalkolcuoglu/AE.git'
+    dest: /tmp/automationexerciseapp
+
+- name: Publish the App
+  command: dotnet publish --configuration Release /tmp/automationexerciseapp/src/AutomationExercise.csproj
+
+- name: Ensure /var/www/automationexerciseapp/ dir exists
+  file:
+    path: /var/www/automationexerciseapp/
+    state: directory
+
+- name: Copy Published App to Server
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/automationexerciseapp/
+    owner: nginx
+    group: nginx
+    mode: '0755'
+  with_fileglob:
+    - /tmp/automationexerciseapp/src/bin/Release/net5.0/publish/*
+
+- name: Create a Service for App
+  template: 
+    src: kestrel-automationexerciseapp.service
+    dest: /etc/systemd/system/kestrel-automationexerciseapp.service
+
+- name: Start the Service
+  service: 
+    name: kestrel-automationexerciseapp.service
+    state: started
+    enabled: yes
+
+- name: Restart the Server
+  service: 
+    name: nginx
+    state: restarted
